@@ -17,11 +17,11 @@ Population:    23,815,797
 
 CDC Report
 
-Total Tests: 75,516
-Excluded (Negative tests): 74,593
-Confirmed: 446
-Deaths: 7
-Recovered: 435
-(Since Yesterday) Tested: 157
+Total Tests:                75,516
+Excluded (Negative tests):  74,593
+Confirmed:                  446
+Deaths:                     7
+Recovered:                  435
+(Since Yesterday) Tested:   157
 (Since Yesterday) Excluded: 118
-(Since Yesterday) Deaths: 0
+(Since Yesterday) Deaths:   0

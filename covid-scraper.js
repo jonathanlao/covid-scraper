@@ -44,14 +44,14 @@ function getTaiwanCdcReport(resp) {
     return `
 CDC Report
 
-Total Tests: ${data["送驗"]}
-Excluded (Negative tests): ${data["排除(新)"]}
-Confirmed: ${data["確診"]}
-Deaths: ${data["死亡"]}
-Recovered: ${data["解除隔離"]}
-(Since Yesterday) Tested: ${data["昨日送驗"]}
+Total Tests:                ${data["送驗"]}
+Excluded (Negative tests):  ${data["排除(新)"]}
+Confirmed:                  ${data["確診"]}
+Deaths:                     ${data["死亡"]}
+Recovered:                  ${data["解除隔離"]}
+(Since Yesterday) Tested:   ${data["昨日送驗"]}
 (Since Yesterday) Excluded: ${data["昨日排除"]}
-(Since Yesterday) Deaths: ${data["昨日確診"]}`
+(Since Yesterday) Deaths:   ${data["昨日確診"]}`
 }
 
 function getTaiwanWorldometerReport(content) {

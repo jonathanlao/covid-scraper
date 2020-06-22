@@ -6,10 +6,55 @@ const url = 'https://www.reddit.com';
 
 (async () => {
     const browser = await puppeteer.launch()
-    const page = await browser.newPage()
-    await page.goto('https://www.worldometers.info/coronavirus/')
-    let content = await page.content();
+    const promises = [];
 
+    let worldometerPromise = browser.newPage().then(async page => {
+        await page.goto('https://www.worldometers.info/coronavirus/');
+        let content = await page.content();
+        let worldometerReport = getTaiwanWorldometerReport(content)
+        return worldometerReport
+    })
+    .catch(err => {
+        console.log(err);
+    });
+    
+    let cdcPromise = rp("https://covid19dashboard.cdc.gov.tw/dash3")
+        .then(getTaiwanCdcReport)
+        .catch(function(err){
+            console.log(err);
+        });
+
+    promises.push(worldometerPromise, cdcPromise);
+
+    let finalReport = await Promise.all(promises).then(aggregateReports);
+    console.log(finalReport);
+
+    await browser.close()
+})()
+
+function aggregateReports(reports) {
+    let finalReport = "Taiwan Covid Statistics\n\n";
+    finalReport += reports[0] + "\n";
+    finalReport += reports[1];
+    return finalReport;
+}
+
+function getTaiwanCdcReport(resp) {
+    data = JSON.parse(resp)["0"];
+    return `
+CDC Report
+
+Total Tests: ${data["送驗"]}
+Excluded (Negative tests): ${data["排除(新)"]}
+Confirmed: ${data["確診"]}
+Deaths: ${data["死亡"]}
+Recovered: ${data["解除隔離"]}
+(Since Yesterday) Tested: ${data["昨日送驗"]}
+(Since Yesterday) Excluded: ${data["昨日排除"]}
+(Since Yesterday) Deaths: ${data["昨日確診"]}`
+}
+
+function getTaiwanWorldometerReport(content) {
     let table = $('#main_table_countries_today', content).html();
     
     let headers = [];
@@ -27,12 +72,10 @@ const url = 'https://www.reddit.com';
     });
 
     if (headers.length !== taiwanValues.length) {
-        console.log("ERROR: Number of headers does not match number of values.");
-        await browser.close()
-        return;
+        return "ERROR (Worldometer Report): Number of headers does not match number of values.";
     }
 
-    let report = "Taiwan Worldometer Values\n";
+    let report = "Worldometer Values\n\n";
     headers.forEach((e, i) => {
         // Todo: less fragile way to ignore columns we don't care about
         if ([0, 1, 12, 14].includes(i)) {
@@ -43,28 +86,5 @@ const url = 'https://www.reddit.com';
         report += taiwanValues[i] ? taiwanValues[i] : "N/A";
         report += "\n";
     });
-    console.log(report);
-    
-    await browser.close()
-})()
-
-
-  /*
-puppeteer
-  .launch()
-  .then(function(browser) {
-    return browser.newPage();
-  })
-  .then(function(page) {
-    return page.goto(url).then(function() {
-      return page.content();
-    });
-  })
-  .then(function(html) {
-    $('h3', html).each(function() {
-      console.log($(this).text());
-    });
-  })
-  .catch(function(err) {
-    //handle error
-  }); */
+    return report;
+}
